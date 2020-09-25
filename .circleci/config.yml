@@ -22,8 +22,9 @@ jobs:
       - run:
           name: Connect through VPN
           command: |
+            echo $VPN_CLIENT_CONFIG | base64 --decode >> config.ovpn
             wget -qO- http://checkip.amazonaws.com | tee initial.ip
-            sudo openvpn --config config.ovpn --auth-user-pass vpn.login > openvpn.log 2>&1 &
+            sudo openvpn --config config.ovpn > openvpn.log 2>&1 &
             while [ -n "$(ip addr show tun0 2>&1 > /dev/null)" ]; do
               sleep 0.1;
             done
