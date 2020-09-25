@@ -34,7 +34,6 @@ jobs:
             while [ -n "$(ip addr show tun0 2>&1 > /dev/null)" ]; do
               sleep 0.1;
             done
-            cat openvpn.log
             wget -qO- http://checkip.amazonaws.com | tee final.ip
             if [ "$(cat initial.ip)" == "$(cat final.ip)" ]
             then
