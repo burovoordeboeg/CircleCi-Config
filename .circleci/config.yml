@@ -29,19 +29,12 @@ jobs:
           name: Connect through VPN
           command: |
             echo $VPN_CLIENT_CONFIG | base64 --decode >> config.ovpn
-            wget -qO- http://checkip.amazonaws.com | tee initial.ip
-            sudo openvpn --config config.ovpn &
-            while [ -n "$(ip addr show tun0 2>&1 > /dev/null)" ]; do
-              sleep 0.1;
-            done
-            wget -qO- http://checkip.amazonaws.com | tee final.ip
-            if [ "$(cat initial.ip)" == "$(cat final.ip)" ]
-            then
-              echo "This computer's apparent public IP address was not different after connecting"
-              echo "This may mean that your VPN is not configured correctly."
-              exit 1
-            fi
+            sudo openvpn --config config.ovpn
     
+      - run: 
+          name: Sleep 10 sec
+          command: sleep 10
+
       - checkout
 
       - add_ssh_keys:
