@@ -21,29 +21,13 @@ jobs:
 
       - run:
           name: Connect through VPN
-          command: >
+          command: |
             echo $VPN_CLIENT_CONFIG | base64 --decode >> config.ovpn
-
             wget -qO- http://checkip.amazonaws.com | tee initial.ip
-
             sudo openvpn --config config.ovpn >
-            openvpn.log 2>&1 &
-    
             while [ -n "$(ip addr show tun0 2>&1 > /dev/null)" ]; do
               sleep 0.1;
             done
-    
-            cat openvpn.log
-    
-            wget -qO- http://checkip.amazonaws.com | tee final.ip
-    
-            if [ "$(cat initial.ip)" == "$(cat final.ip)" ]
-    
-            then
-              echo "This computer's apparent public IP address was not different after connecting"
-              echo "This may mean that your VPN is not configured correctly."
-              exit 1
-            fi
     
       - checkout
 
@@ -60,6 +44,11 @@ jobs:
           command:  rsync -avzp --chown=$USER:$USER --delete --exclude-from '.rsyncignore' . $USER@$SERVER_IP:/home/$USER/domains/$PRODUCTION_PATH
 
       - run:
-          name: Disconnect from OpenVPN
-          command: sudo killall openvpn || true
-          when: always
+        name: Disconnect from VPN
+        command: sudo killall openvpn || true
+        when: always
+
+      - run:
+        name: Remove OpenVPN config
+        command: sudo rm config.ovpn
+        when: always
