@@ -10,7 +10,7 @@ workflows:
 jobs:
   build:
     machine:
-      image: cimg/base:1804.01
+      image: cimg/base:stable-18.04
     steps:
       - run:
           name: Install OpenVPN and Rsync
