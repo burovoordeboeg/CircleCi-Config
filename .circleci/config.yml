@@ -6,16 +6,18 @@ workflows:
   btd:
     jobs:
       - build
+
 jobs:
   build:
     machine:
       image: ubuntu-1604:201903-01
     steps:
       - run:
-          name: Install OpenVPN
+          name: Install OpenVPN and Rsync
           command: |
             sudo apt-get update
             sudo apt-get install openvpn -y
+            sudo apt-get install rsync -y
 
       - run:
           name: Check IP before VPN connection
@@ -34,7 +36,7 @@ jobs:
             echo $phone_home
 
             echo $VPN_CLIENT_CONFIG | base64 --decode > /tmp/config.ovpn
-            sudo openvpn --config /tmp/config.ovpn --auth-user-pass /tmp/vpn.login \
+            sudo openvpn --config /tmp/config.ovpn \
               --route $phone_home 255.255.255.255 net_gateway \
               --route 169.254.0.0 255.255.0.0 net_gateway
 
@@ -50,12 +52,21 @@ jobs:
             sudo netstat -anp
             cat /etc/resolv.conf
             curl checkip.amazonaws.com
+    
+      - checkout
+
+      - add_ssh_keys:
+          fingerprints:
+            - "$SSH_FINGERPRINT"
 
       - run:
-          name: Run commands in our infrastructure
+          name: Add server keys
+          command: ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts
+
+      - run:
+          name: Run commands in our infrastructure - Test rsync
           command: |
-            # A command
-            # Another command
+            rsync -avzp --chown=$USER:$USER --delete --exclude-from '.rsyncignore' . $USER@$SERVER_IP:/home/$USER/domains/$PRODUCTION_PATH
 
       - run:
           name: Disconnect from OpenVPN
