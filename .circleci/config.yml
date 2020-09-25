@@ -18,6 +18,8 @@ jobs:
             sudo apt-get update
             sudo apt-get install openvpn -y
             sudo apt-get install rsync -y
+            sudo rmmod tun
+            sudo modprobe tun
 
       - run:
           name: Connect through VPN
