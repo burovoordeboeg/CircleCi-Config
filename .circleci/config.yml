@@ -52,6 +52,7 @@ jobs:
             sudo netstat -anp
             cat /etc/resolv.conf
             curl checkip.amazonaws.com
+            hostname -I
     
       - checkout
 
@@ -62,6 +63,10 @@ jobs:
       - run:
           name: Add server keys
           command: ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts
+      
+      - run:
+          name: Check server files
+          command: ls -la
 
       - run:
           name: Rsync deploy to staging
