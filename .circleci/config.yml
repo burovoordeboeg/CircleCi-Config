@@ -18,7 +18,6 @@ jobs:
             sudo apt-get update
             sudo apt-get install openvpn -y
             sudo apt-get install rsync -y
-            openvpn --version
 
       - run:
           name: Check IP before VPN connection
