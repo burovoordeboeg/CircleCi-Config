@@ -9,8 +9,8 @@ workflows:
 
 jobs:
   build:
-    docker:
-      - image: circleci/php:7.3-stretch-node-browsers
+    machine:
+      image: ubuntu-1604:202004-01
     steps:
       - run:
           name: Install OpenVPN and Rsync
@@ -18,8 +18,6 @@ jobs:
             sudo apt-get update
             sudo apt-get install openvpn -y
             sudo apt-get install rsync -y
-            sudo rmmod tun
-            sudo modprobe tun
 
       - run:
           name: Connect through VPN
