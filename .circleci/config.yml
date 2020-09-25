@@ -20,37 +20,30 @@ jobs:
             sudo apt-get install rsync -y
 
       - run:
-          name: Check IP before VPN connection
-          command: |
-            ifconfig
-            route -n
-            sudo netstat -anp
-            cat /etc/resolv.conf
-            curl checkip.amazonaws.com
+          name: Connect through VPN
+          command: >
+            echo $VPN_CLIENT_CONFIG | base64 --decode >> config.ovpn
 
-      - run:
-          name: VPN Setup
-          background: true
-          command: |
-            phone_home=$(netstat -an | grep ':22 .*ESTABLISHED' | head -n1 | awk '{ split($5, a, ":"); print a[1] }')
-            echo $phone_home
+            wget -qO- http://checkip.amazonaws.com | tee initial.ip
 
-            echo $VPN_CLIENT_CONFIG > /tmp/config.ovpn
-            sudo openvpn --config /tmp/config.ovpn
-
-      - run:
-          name: Wait for the connection to be established
-          command: sleep 30
-
-      - run:
-          name: Check IP after VPN connection
-          command: |
-            ifconfig
-            route -n
-            sudo netstat -anp
-            cat /etc/resolv.conf
-            curl checkip.amazonaws.com
-            hostname -I
+            sudo openvpn --config config.ovpn >
+            openvpn.log 2>&1 &
+    
+            while [ -n "$(ip addr show tun0 2>&1 > /dev/null)" ]; do
+              sleep 0.1;
+            done
+    
+            cat openvpn.log
+    
+            wget -qO- http://checkip.amazonaws.com | tee final.ip
+    
+            if [ "$(cat initial.ip)" == "$(cat final.ip)" ]
+    
+            then
+              echo "This computer's apparent public IP address was not different after connecting"
+              echo "This may mean that your VPN is not configured correctly."
+              exit 1
+            fi
     
       - checkout
 
