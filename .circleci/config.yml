@@ -28,13 +28,13 @@ jobs:
       - run:
           name: Connect through VPN
           command: |
-          phone_home=$(netstat -an | grep ':22 .*ESTABLISHED' | head -n1 | awk '{ split($5, a, ":"); print a[1] }')
-          echo $phone_home
+            phone_home=$(netstat -an | grep ':22 .*ESTABLISHED' | head -n1 | awk '{ split($5, a, ":"); print a[1] }')
+            echo $phone_home
 
-          echo $VPN_CLIENT_CONFIG | base64 --decode > /tmp/config.ovpn
-          sudo openvpn --config /tmp/config.ovpn \
-            --route $phone_home 255.255.255.255 net_gateway \
-            --route 169.254.0.0 255.255.0.0 net_gateway
+            echo $VPN_CLIENT_CONFIG | base64 --decode > /tmp/config.ovpn
+            sudo openvpn --config /tmp/config.ovpn \
+              --route $phone_home 255.255.255.255 net_gateway \
+              --route 169.254.0.0 255.255.0.0 net_gateway
 
       - checkout
 
