@@ -16,7 +16,12 @@ jobs:
           name: Install OpenVPN and Rsync
           command: |
             sudo apt-get update
-            sudo apt-get install openvpn -y
+            sudo wget https://swupdate.openvpn.org/community/releases/openvpn-2.4.7.tar.gz
+            sudo tar xfz openvpn-2.4.7.tar.gz
+            sudo cd openvpn-2.4.7
+            sudo ./configure
+            sudo make
+            sudo make install
             sudo apt-get install rsync -y
 
       - run:
