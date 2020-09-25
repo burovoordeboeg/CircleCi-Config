@@ -64,11 +64,6 @@ jobs:
           command: ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts
 
       - run:
-          name: Run commands in our infrastructure - Test rsync
-          command: |
-            rsync -avzp --chown=$USER:$USER --delete --exclude-from '.rsyncignore' . $USER@$SERVER_IP:/home/$USER/domains/$PRODUCTION_PATH
-
-      - run:
           name: Disconnect from OpenVPN
           command: sudo killall openvpn || true
           when: always
