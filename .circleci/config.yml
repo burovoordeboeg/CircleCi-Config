@@ -9,8 +9,8 @@ workflows:
 
 jobs:
   build:
-    machine:
-      image: cimg/base:2020.01
+    docker:
+      - image: circleci/php:7.3-stretch-node-browsers
     steps:
       - run:
           name: Install OpenVPN and Rsync
