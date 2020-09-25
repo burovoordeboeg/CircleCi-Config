@@ -18,6 +18,10 @@ jobs:
             sudo apt-get update
             sudo apt-get install openvpn -y
             sudo apt-get install rsync -y
+
+      - run:
+          name: Run docker specific commands
+          command: |
             mkdir -p /dev/net
             mknod /dev/net/tun c 10 200
             chmod 600 /dev/net/tun
