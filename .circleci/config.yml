@@ -26,39 +26,39 @@ jobs:
             sudo make install
             sudo apt-get install rsync -y
     
-      -- run:
-        name: Check IP before VPN connection
-        command: |
-          ifconfig
-          route -n
-          sudo netstat -anp
-          cat /etc/resolv.conf
-          curl checkip.amazonaws.com
+      - run:
+          name: Check IP before VPN connection
+          command: |
+            ifconfig
+            route -n
+            sudo netstat -anp
+            cat /etc/resolv.conf
+            curl checkip.amazonaws.com
 
-    - run:
-        name: VPN Setup
-        background: true
-        command: |
-          phone_home=$(netstat -an | grep ':22 .*ESTABLISHED' | head -n1 | awk '{ split($5, a, ":"); print a[1] }')
-          echo $phone_home
+      - run:
+          name: VPN Setup
+          background: true
+          command: |
+            phone_home=$(netstat -an | grep ':22 .*ESTABLISHED' | head -n1 | awk '{ split($5, a, ":"); print a[1] }')
+            echo $phone_home
 
-          echo $VPN_CLIENT_CONFIG | base64 --decode > /tmp/config.ovpn
-          sudo openvpn --config /tmp/config.ovpn \
-            --route $phone_home 255.255.255.255 net_gateway \
-            --route 169.254.0.0 255.255.0.0 net_gateway
+            echo $VPN_CLIENT_CONFIG | base64 --decode > /tmp/config.ovpn
+            sudo openvpn --config /tmp/config.ovpn \
+              --route $phone_home 255.255.255.255 net_gateway \
+              --route 169.254.0.0 255.255.0.0 net_gateway
 
-    - run:
-        name: Wait for the connection to be established
-        command: sleep 15
+      - run:
+          name: Wait for the connection to be established
+          command: sleep 15
 
-    - run:
-        name: Check IP after VPN connection
-        command: |
-          ifconfig
-          route -n
-          sudo netstat -anp
-          cat /etc/resolv.conf
-          curl checkip.amazonaws.com
+      - run:
+          name: Check IP after VPN connection
+          command: |
+            ifconfig
+            route -n
+            sudo netstat -anp
+            cat /etc/resolv.conf
+            curl checkip.amazonaws.com
 
       - add_ssh_keys:
           fingerprints:
