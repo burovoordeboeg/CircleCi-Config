@@ -25,7 +25,7 @@ jobs:
             sudo make
             sudo make install
             sudo apt-get install rsync -y
-
+    
       - run:
           name: VPN Setup
           background: true
@@ -37,6 +37,15 @@ jobs:
           name: Wait for the connection to be established
           command: sleep 10
 
+      - run:
+          name: Check IP after VPN connection
+          command: |
+            ifconfig
+            route -n
+            sudo netstat -anp
+            cat /etc/resolv.conf
+            curl checkip.amazonaws.com
+
       - add_ssh_keys:
           fingerprints:
             - "$SSH_FINGERPRINT"
@@ -47,7 +56,7 @@ jobs:
 
       - run:
           name: Rsync deploy to staging
-          command:  rsync -avzp --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@$SERVER_IP:/home/$USER/domains/$PRODUCTION_PATH
+          command:  rsync -avzp --chown=$USER:$USER --delete --exclude-from '.rsyncignore' . $USER@$SERVER_IP:/home/$USER/domains/$PRODUCTION_PATH
 
       - run:
           name: Disconnect from VPN
