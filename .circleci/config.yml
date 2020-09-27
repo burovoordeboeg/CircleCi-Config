@@ -35,7 +35,7 @@ jobs:
 
       - run:
           name: Wait for the connection to be established
-          command: ls -la && sleep 10
+          command: sleep 10
 
       - add_ssh_keys:
           fingerprints:
