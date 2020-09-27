@@ -11,6 +11,8 @@ jobs:
   build:
     machine: true
     steps:
+      - checkout
+
       - run:
           name: Install OpenVPN and Rsync
           command: |
@@ -47,7 +49,7 @@ jobs:
 
       - run:
           name: Wait for the connection to be established
-          command: sleep 30
+          command: sleep 10
 
       - run:
           name: Check IP after VPN connection
@@ -57,8 +59,6 @@ jobs:
             sudo netstat -anp
             cat /etc/resolv.conf
             curl checkip.amazonaws.com
-
-      - checkout
 
       - add_ssh_keys:
           fingerprints:
