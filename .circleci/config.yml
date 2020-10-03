@@ -35,6 +35,10 @@ jobs:
             cat /etc/resolv.conf
             curl checkip.amazonaws.com
 
+      - add_ssh_keys:
+          fingerprints:
+            - "$SSH_FINGERPRINT"
+            
       - run:
           name: VPN Setup
           background: true
@@ -59,14 +63,6 @@ jobs:
             sudo netstat -anp
             cat /etc/resolv.conf
             curl checkip.amazonaws.com
-
-      - add_ssh_keys:
-          fingerprints:
-            - "$SSH_FINGERPRINT"
-
-      - run:
-          name: Add server keys
-          command: ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts
 
       - run:
           name: Rsync deploy to staging
