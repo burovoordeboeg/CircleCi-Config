@@ -17,8 +17,7 @@ jobs:
           name: Install OpenVPN and Rsync
           command: |
             sudo apt-get update
-            sudo apt-get install libssl-dev liblzo2-dev libpam0g-dev curl npm rsync -y
-            sudo apt-get install php7.0-fpm git unzip -y
+            sudo apt-get install libssl-dev liblzo2-dev libpam0g-dev curl npm rsync php git unzip -y
             sudo wget https://swupdate.openvpn.org/community/releases/openvpn-2.4.7.tar.gz
             sudo tar xfz openvpn-2.4.7.tar.gz
             cd openvpn-2.4.7
