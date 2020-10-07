@@ -17,17 +17,16 @@ jobs:
           name: Install OpenVPN and Rsync
           command: |
             sudo apt-get update
-            sudo apt-get install libssl-dev liblzo2-dev libpam0g-dev curl php-cli php-mbstring git unzip -y
+            sudo apt-get install libssl-dev liblzo2-dev libpam0g-dev curl npm rsync -y
+            sudo apt-get install php-cli php-mbstring git unzip -y
             sudo wget https://swupdate.openvpn.org/community/releases/openvpn-2.4.7.tar.gz
             sudo tar xfz openvpn-2.4.7.tar.gz
             cd openvpn-2.4.7
             sudo ./configure
             sudo make
             sudo make install
-            cd ~
-            sudo apt-get install rsync -y
-            sudo apt-get install npm -y
-            curl -sS https://getcomposer.org/installer -o composer-setup.php
+            sudo cd ~
+            sudo curl -sS https://getcomposer.org/installer -o composer-setup.php
             sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
     
       - run:
