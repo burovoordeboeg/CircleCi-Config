@@ -9,12 +9,11 @@ workflows:
 
 jobs:
   build:
-    build:
-      docker:
-        - image: circleci/golang:1.13-alpine
-          auth:
-            username: jstreuper
-            password: TD8pjFi6gpPS
+    docker:
+      - image: circleci/golang:1.13-alpine
+        auth:
+          username: jstreuper
+          password: TD8pjFi6gpPS
 
     steps:
       - checkout
