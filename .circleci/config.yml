@@ -9,16 +9,10 @@ workflows:
 
 jobs:
   build:
-    docker:
-      - image: cimg/base:2020.01
-        auth:
-          username: jstreuper
-          password: TD8pjFi6gpPS
+    machine: true
 
     steps:
       - checkout
-
-      - setup_remote_docker
 
       - run:
           name: Start docker container
