@@ -10,7 +10,7 @@ workflows:
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.13-alpine
+      - image: cimg/base:2020.01
         auth:
           username: jstreuper
           password: TD8pjFi6gpPS
