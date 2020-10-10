@@ -11,7 +11,7 @@ jobs:
   build:
     working_directory: ~/theme
     docker:
-      - image: jstreuper/circleci-deploy
+      - image: jstreuper/circleci-deploy:0.0.1
         auth:
             username: jstreuper
             password: TD8pjFi6gpPS
