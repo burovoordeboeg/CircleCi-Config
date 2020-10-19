@@ -8,8 +8,7 @@ references:
       run:
         name: Open the SSH Tunnel
         command: |
-          echo $SSH_PUBKEY >> pub.key
-          ssh -L 3000:s01.burovoordeboeg.nl:22 -i 'pub.key' circleci@185.21.241.163
+          ssh -L 3000:s01.burovoordeboeg.nl:22 circleci@185.21.241.163
 
     append_ssh_private: &append_ssh_private
       add_ssh_keys:
