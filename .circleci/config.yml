@@ -4,11 +4,11 @@ references:
       docker:
         - image: circleci/php:7.3-stretch-node-browsers
   
-    open_ssh_tunnel: &open-ssh-tunnel
+    open_ssh_tunnel: &open_ssh_tunnel
         name: Open a SSH Tunnel
         command: ssh -L 3000:s01.burovoordeboeg.nl:22 -i '$SSH_PUBKEY' circleci@185.21.241.163
 
-    add_ssh_fingerprint: &add-ssh-fingerprint
+    add_ssh_fingerprint: &add_ssh_fingerprint
       fingerprints:
         - "$SSH_FINGERPRINT"
 
@@ -18,8 +18,8 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - open-ssh-tunnel
-      - add-ssh-fingerprint
+      - open_ssh_tunnel
+      - add_ssh_fingerprint
       - run:
           name: Rsync deploy to staging
           command: rsync -avzp --chown=$USER:$USER --delete --exclude-from '.rsyncignore' . $USER@$SERVER_IP:/home/$USER/domains/$STAGING_PATH
