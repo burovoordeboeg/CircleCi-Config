@@ -1,0 +1,67 @@
+# ENV Variables
+# $VPN_CLIENT_CONFIG = Base64 encoded OVPN
+
+version: 2.1
+workflows:
+  btd:
+    jobs:
+      - build
+
+jobs:
+  build:
+    machine: true
+
+    steps:
+      - checkout
+
+      - run:
+          name: Start docker container
+          command: |
+            docker run --cap-add=NET_ADMIN --device /dev/net/tun:/dev/net/tun jstreuper/circleci-deploy:0.0.1
+    
+      - run:
+          name: Check IP before VPN connection
+          command: |
+            ifconfig
+            route -n
+            sudo netstat -anp
+            cat /etc/resolv.conf
+            curl checkip.amazonaws.com
+
+      - add_ssh_keys:
+          fingerprints:
+            - "$SSH_FINGERPRINT"
+            
+      - run:
+          name: VPN Setup
+          background: true
+          command: |
+            echo $VPN_CLIENT_CONFIG | base64 --decode > /tmp/config.ovpn
+            sudo openvpn --config /tmp/config.ovpn
+
+      - run:
+          name: Wait for the connection to be established
+          command: sleep 15
+
+      - run:
+          name: Check IP after VPN connection
+          command: |
+            ifconfig
+            route -n
+            sudo netstat -anp
+            cat /etc/resolv.conf
+            curl checkip.amazonaws.com
+
+      - run:
+          name: Rsync deploy to staging
+          command:  rsync -avzp --progress --stats --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@$SERVER_IP:/home/$USER/domains/$PRODUCTION_PATH
+
+      - run:
+          name: Disconnect from VPN
+          command: sudo killall openvpn || true
+          when: always
+
+      - run:
+          name: Remove OpenVPN config
+          command: sudo rm /tmp/config.ovpn
+          when: always
