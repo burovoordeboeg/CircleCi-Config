@@ -23,12 +23,13 @@ jobs:
     steps:
       - checkout
       - dmz/open_tunnel:
-        local_port: "3000"
-        target_host: "s01.burovoordeboeg.nl"
-        target_port: "22"
-        bastion_user: circleci
-        bastion_host: 185.21.241.163
-        bastion_public_key: bastion.pub
+          local_port: "3000"
+          target_host: "s01.burovoordeboeg.nl"
+          target_port: "22"
+          bastion_user: circleci
+          bastion_host: 185.21.241.163
+          bastion_public_key: bastion.pub
+      - run: curl localhost:9001
       - run:
           name: Rsync deploy to staging
           command: rsync -avzp --chown=$USER:$USER --delete --exclude-from '.rsyncignore' . $USER@$SERVER_IP:/home/$USER/domains/$STAGING_PATH
