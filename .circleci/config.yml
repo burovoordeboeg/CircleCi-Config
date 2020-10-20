@@ -8,6 +8,7 @@ references:
       run:
         name: Open the SSH Tunnel
         command: |
+          ssh-keyscan 185.21.241.163 >> ~/.ssh/known_hosts
           ssh -L 3000:s01.burovoordeboeg.nl:22 -i 'pubkey' circleci@185.21.241.163
 
     append_ssh_private: &append_ssh_private
