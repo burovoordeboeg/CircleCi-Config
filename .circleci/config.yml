@@ -30,6 +30,9 @@ jobs:
       - checkout
       - <<: *append_ssh_private
       - <<: *open_ssh_tunnel
+      - run:
+          name: Add IP to known_hosts
+          command: ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts
       - <<: *append_ssh_serverkey
       - run:
           name: Rsync deploy to staging
