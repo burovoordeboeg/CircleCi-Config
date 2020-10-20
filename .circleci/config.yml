@@ -35,7 +35,7 @@ jobs:
       - run:
           name: Get SSH location
           command: |
-            ssh-add -la
+            ssh-add -l
             cd ~/.ssh 
             ls -la
             sleep 30
