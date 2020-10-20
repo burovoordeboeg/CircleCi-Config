@@ -36,7 +36,7 @@ jobs:
       - <<: *append_ssh_serverkey
       - run:
           name: Rsync deploy to staging
-          command: rsync -avz -e "ssh -p 3000" --chown=$USER:$USER --delete --exclude-from '.rsyncignore' . $USER@$SERVER_IP:/home/$USER/domains/$PRODUCTION_PATH
+          command: rsync -avz -e "ssh -p3000" --chown=$USER:$USER --delete --exclude-from '.rsyncignore' . $USER@s01.burovoordeboeg.nl:/home/$USER/domains/$PRODUCTION_PATH
 
 workflows: 
   version: 2
