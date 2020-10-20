@@ -16,6 +16,7 @@ references:
       add_ssh_keys:
         fingerprints:
           - 5a:bd:a1:36:50:a0:15:b2:0c:6b:87:6f:3d:55:de:4e
+          - 76:d7:57:c9:86:8c:83:4e:bb:36:7f:26:41:15:4d:db
 
     append_ssh_serverkey: &append_ssh_serverkey
       add_ssh_keys:
