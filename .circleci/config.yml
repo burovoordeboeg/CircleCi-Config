@@ -35,8 +35,11 @@ jobs:
           command: ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts
       - <<: *append_ssh_serverkey
       - run:
+          name: Append key to known_hosts
+          command: ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts
+      - run:
           name: Rsync deploy to staging
-          command: rsync -avzp --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@3000:$SERVER_IP:/home/$USER/domains/$STAGING_PATH
+          command: rsync -avzp --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@$SERVER_IP:3000:/home/$USER/domains/$STAGING_PATH
 
 workflows: 
   version: 2
