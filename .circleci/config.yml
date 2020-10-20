@@ -4,14 +4,6 @@ references:
       docker:
         - image: circleci/php:7.3-stretch-node-browsers
 
-    open_ssh_tunnel: &open_ssh_tunnel
-      run:
-        name: Open the SSH Tunnel
-        background: true
-        command: |
-          ssh-keyscan 185.21.241.163 >> ~/.ssh/known_hosts
-          ssh -L 3000:s01.burovoordeboeg.nl:22 circleci@185.21.241.163
-
     append_ssh_private: &append_ssh_private
       add_ssh_keys:
         fingerprints:
@@ -29,14 +21,12 @@ jobs:
     steps:
       - checkout
       - <<: *append_ssh_private
-      - <<: *open_ssh_tunnel
-      - run:
-          name: Add IP to known_hosts
-          command: ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts
       - <<: *append_ssh_serverkey
       - run:
           name: Rsync deploy to staging
-          command: rsync -avz -e "ssh -p3000" --chown=$USER:$USER --delete --exclude-from '.rsyncignore' . $USER@localhost:/home/$USER/domains/$PRODUCTION_PATH
+          command: |
+            ssh-keyscan 185.21.241.163 >> ~/.ssh/known_hosts
+            rsync -avz -e "ssh -L 3000:$SERVER_IP:22 circleci@185.21.241.163 && ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts" --chown=$USER:$USER --delete --exclude-from '.rsyncignore' . $USER@$SERVER_IP:/home/$USER/domains/$PRODUCTION_PATH
 
 workflows: 
   version: 2
