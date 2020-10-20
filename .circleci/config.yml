@@ -36,7 +36,7 @@ jobs:
       - <<: *append_ssh_serverkey
       - run:
           name: Rsync deploy to staging
-          command: rsync -avz -e "ssh -o StrictHostKeyChecking=no" --post=3000 --chown=$USER:$USER --exclude-from '.rsyncignore' . circleci@127.0.0.1:/home/$USER/domains/$STAGING_PATH
+          command: rsync -avz -e "ssh -o StrictHostKeyChecking=no" --port=3000 --chown=$USER:$USER --exclude-from '.rsyncignore' . circleci@127.0.0.1:/home/$USER/domains/$STAGING_PATH
 
 workflows: 
   version: 2
