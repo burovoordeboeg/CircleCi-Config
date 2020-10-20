@@ -35,7 +35,9 @@ jobs:
       - run:
           name: Get SSH location
           command: |
-            ssh-add -l
+            ssh-add -la
+            cd ~/.ssh 
+            ls -la
             sleep 30
       - run:
           name: Rsync deploy to staging
