@@ -16,12 +16,6 @@ references:
       add_ssh_keys:
         fingerprints:
           - 5a:bd:a1:36:50:a0:15:b2:0c:6b:87:6f:3d:55:de:4e
-          - 76:d7:57:c9:86:8c:83:4e:bb:36:7f:26:41:15:4d:db
-
-    append_ssh_serverkey: &append_ssh_serverkey
-      add_ssh_keys:
-        fingerprints:
-          - 76:d7:57:c9:86:8c:83:4e:bb:36:7f:26:41:15:4d:db
 
 version: 2.1
 jobs:
@@ -41,9 +35,14 @@ jobs:
             ls -la
             sleep 10
       - run:
+          name: test to put ssh server key in local file
+          command: |
+            ls -la
+            echo $SSH_SERVER_KEY >> server.key
+      - run:
           name: Rsync deploy to staging
           command: |
-            rsync -avz -e 'ssh -p 3000 -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa_76d757c9868c834ebb367f2641154ddb' --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/$STAGING_PATH
+            rsync -avz -e 'ssh -p 3000 -o StrictHostKeyChecking=no -i server.key' --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/$PRODUCTION_PATH
 
 workflows: 
   version: 2
