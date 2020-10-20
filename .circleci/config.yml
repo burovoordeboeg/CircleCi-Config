@@ -16,6 +16,7 @@ references:
       add_ssh_keys:
         fingerprints:
           - 5a:bd:a1:36:50:a0:15:b2:0c:6b:87:6f:3d:55:de:4e
+          - 76:d7:57:c9:86:8c:83:4e:bb:36:7f:26:41:15:4d:db
 
     append_ssh_serverkey: &append_ssh_serverkey
       add_ssh_keys:
@@ -28,15 +29,15 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      # - <<: *append_ssh_private
+      # - <<: *open_ssh_tunnel
       - <<: *append_ssh_private
-      - <<: *open_ssh_tunnel
-      - <<: *append_ssh_serverkey
       - run:
           name: Rsync deploy to staging
           command: |
-            ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts
-            rsync -avz -e 'ssh -p 3000 -o StrictHostKeyChecking=no' --chown=buroboeg:buroboeg --exclude-from '.rsyncignore' . buroboeg@127.0.0.1:/home/buroboeg/domains/assets.burovoordeboeg.nl/public_html/test/
-
+            ssh-keyscan 185.21.241.163 >> ~/.ssh/known_hosts
+            rsync -avz -e 'ssh -4 -L 3000:s01.burovoordeboeg.nl:22 -Nf circleci@185.21.241.163' --chown=buroboeg:buroboeg --exclude-from '.rsyncignore' . buroboeg@127.0.0.1:/home/buroboeg/domains/assets.burovoordeboeg.nl/public_html/test/
+        
 workflows: 
   version: 2
   deploy:
