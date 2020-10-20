@@ -26,7 +26,7 @@ jobs:
           name: Rsync deploy to staging
           command: |
             ssh-keyscan 185.21.241.163 >> ~/.ssh/known_hosts
-            rsync -avz -e "ssh -L 3000:$SERVER_IP:22 circleci@185.21.241.163 && ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts" --chown=$USER:$USER --delete --exclude-from '.rsyncignore' . $USER@$SERVER_IP:/home/$USER/domains/$PRODUCTION_PATH
+            rsync -avz -e "ssh -o StrictHostKeyChecking=no -L 3000:$SERVER_IP:22 circleci@185.21.241.163" --chown=$USER:$USER --delete --exclude-from '.rsyncignore' . $USER@$SERVER_IP:/home/$USER/domains/$PRODUCTION_PATH
 
 workflows: 
   version: 2
