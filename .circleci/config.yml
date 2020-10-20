@@ -15,13 +15,16 @@ jobs:
           command: |
             echo $SSH_SERVER_KEY >> server.key
             echo $SSH_BASTION_KEY >> bastion.key
+            ls -la
       - run:
           name: Open the SSH Tunnel
           background: true
           command: |
             ssh-keyscan 185.21.241.163 >> ~/.ssh/known_hosts
             ssh -4 -L 3000:s01.burovoordeboeg.nl:22 -i bastion.key -Nf circleci@185.21.241.163
-            sleep 5
+      - run:
+          name: Sleep
+          command: sleep 5
       - run:
           name: Rsync deploy to staging
           command: |
