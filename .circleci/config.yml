@@ -37,7 +37,7 @@ jobs:
       - run:
           name: Rsync deploy to staging
           command: |
-            rsync -avz -e 'ssh -o StrictHostKeyChecking=no' --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:3000:/home/$USER/domains/$STAGING_PATH
+            rsync -avz -e 'ssh -p 3000 -o StrictHostKeyChecking=no' --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/$STAGING_PATH
 
 workflows: 
   version: 2
