@@ -33,11 +33,16 @@ jobs:
       - run:
           name: Add IP to known_hosts
           command: ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts
-      - <<: *append_ssh_serverkey
+      - run:
+          name: sleep
+          command: |
+            cd ~/.ssh/
+            ls -la
+            sleep 10
       - run:
           name: Rsync deploy to staging
           command: |
-            rsync -avz -e 'ssh -p 3000 -o StrictHostKeyChecking=no' --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/$STAGING_PATH
+            rsync -avz -e 'ssh -p 3000 -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa_76d757c9868c834ebb367f2641154ddb' --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/$STAGING_PATH
 
 workflows: 
   version: 2
