@@ -1,2 +1,3 @@
-.circleci
-pubkey
+.*
+bastion.key
+server.key
