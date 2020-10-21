@@ -42,7 +42,7 @@ commands:
       steps:
         - run:
             name: Rsync deploy to <<parameters.environment>>
-            command: rsync -avz -e 'ssh -p $BASTION_PORT -o StrictHostKeyChecking=no -i server.key' --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@$LOCALHOST:/home/$USER/domains/<<parameters.path>>
+            command: rsync -avz -e "ssh -p $BASTION_PORT -o StrictHostKeyChecking=no -i server.key" --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@$LOCALHOST:/home/$USER/domains/<<parameters.path>>
 
 jobs:
   production:
