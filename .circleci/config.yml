@@ -46,7 +46,7 @@ jobs:
       - setup_ssh_keys 
       - open_ssh_tunnel 
       - rsync_deploy:
-          path: $PRODUCTION_PATH
+          path: $PRODUCTION_PATHs
       
 workflows:
   deploy:
