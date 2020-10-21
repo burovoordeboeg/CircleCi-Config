@@ -7,22 +7,15 @@ references:
         - image: circleci/php:7.3-stretch-node-browsers
 
 commands:
-  
+
     # Setup the SSH keys needed to connect
     setup_ssh_keys:
-      parameters:
-        ssh_bastion_key:
-          type: string
-          default: ""
-        ssh_server_key:
-          type: string
-          default: ""
       steps:
         - run:
             name: Put server and bastion keys in a file
             command: |
-              echo $SSH_SERVER_KEY >> server.key
               echo $SSH_BASTION_KEY >> bastion.key
+              echo $SSH_SERVER_KEY >> server.key
     
     # Open a SSH-tunnel
     open_ssh_tunnel:
@@ -31,8 +24,8 @@ commands:
             name: Open SSH Tunnel through Bastion-host
             background: true
             command: |
-              ssh-keyscan 185.21.241.163 >> ~/.ssh/known_hosts
-              ssh -4 -L 3000:s01.burovoordeboeg.nl:22 -i bastion.key -Nf circleci@185.21.241.163
+              ssh-keyscan $BASTION_IP >> ~/.ssh/known_hosts
+              ssh -L $BASTION_PORT:$SERVER_IP:$SERVER_PORT -i bastion.key -Nf $BASTION_USER@$BASTION_IP
         - run:
             name: Wait for tunnel to setup
             command: sleep 8
@@ -40,28 +33,34 @@ commands:
     # Rsync deploy path specified
     rsync_deploy:
       parameters:
+        environment:
+          type: string
+          default: ""
         path:
           type: string
-          default: "none/"
+          default: "none"
       steps:
         - run:
-            name: Rsync deploy
-            command: rsync -avz -e 'ssh -p 3000 -o StrictHostKeyChecking=no -i server.key' --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/<<parameters.path>>
+            name: Rsync deploy to <<parameters.environment>>
+            command: rsync -avz -e 'ssh -p $BASTION_PORT -o StrictHostKeyChecking=no -i server.key' --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@$LOCALHOST:/home/$USER/domains/<<parameters.path>>
 
 jobs:
-  staging:
+  production:
     <<: *defaults
     steps:
       - checkout
-      - setup_ssh_keys 
+      - setup_ssh_keys
       - open_ssh_tunnel 
       - rsync_deploy:
-          path: $PRODUCTION_PATHs
+          environment: Production
+          path: $PRODUCTION_PATH
       
 workflows:
   deploy:
     jobs:
-      - staging:
-        filters: &filter_all
-          tags:
-            only: /.*?/
+      - production:
+          context:
+            - buro-voor-de-boeg
+          filters: &filter_all
+            tags:
+              only: /.*?/
