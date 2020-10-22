@@ -12,29 +12,32 @@ references:
         command: |
           echo $SSH_SERVER_KEY >> server.key
           echo $SSH_BASTION_KEY >> bastion.key
+
     open_ssh_tunnel: &open_ssh_tunnel
       run: 
         name: Open SSH Tunnel through Bastion-host
         background: true
         command: |
           ssh-keyscan 185.21.241.163 >> ~/.ssh/known_hosts
-          ssh -4 -L 3000:s01.burovoordeboeg.nl:22 -i bastion.key -Nf circleci@185.21.241.163
+          ssh -4 -L 3000:s01.burovoordeboeg.nl:22 -Nf circleci@185.21.241.163
+
     sleep_for_ssh: &sleep_for_ssh
       run:
         name: Wait for tunnel to setup
         command: sleep 8
 
-    rsync_deploy_production: &rsync_deploy_production
+commands:
+    rsync_deploy_production:
       run:
         name: Rsync deploy to staging path
-        command: rsync -avz -e 'ssh -p 3000 -o StrictHostKeyChecking=no -i server.key' --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/$PRODUCTION_PATH
+        command: rsync -avz -e 'ssh -p 3000 -o StrictHostKeyChecking=no' --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/$PRODUCTION_PATH
 
 jobs:
   staging:
     <<: *defaults
     steps:
       - checkout
-      - <<: *setup_ssh_keys 
+      # - <<: *setup_ssh_keys 
       - <<: *open_ssh_tunnel 
       - <<: *sleep_for_ssh 
       - <<: *rsync_deploy_production 
