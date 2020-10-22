@@ -27,7 +27,7 @@ commands:
             background: true
             command: |
               ssh-keyscan $BASTION_IP >> ~/.ssh/known_hosts
-              ssh -L $BASTION_PORT:$SERVER_IP:$SERVER_PORT -i bastion.key -Nf $BASTION_USER@$BASTION_IP
+              ssh -4 -L 3000:s01.burovoordeboeg.nl:22 -i bastion.key -Nf circleci@185.21.241.163
         - run:
             name: Wait for tunnel to setup
             command: sleep 8
