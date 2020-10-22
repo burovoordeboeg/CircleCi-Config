@@ -12,10 +12,8 @@ references:
     run:
       name: Put server and bastion keys in a file
       command: |
-        echo $SSH_BASTION_KEY >> bastion.key
-        echo $SSH_SERVER_KEY >> server.key
-        sudo chmod 700 bastion.key
-        sudo chmod 700 server.key
+        echo $SSH_BASTION_KEY >> ~/.ssh/bastion.key
+        echo $SSH_SERVER_KEY >> ~/.ssh/server.key
   
   # Open a SSH-tunnel
   open_ssh_tunnel: &open_ssh_tunnel
@@ -24,7 +22,7 @@ references:
       background: true
       command: |
         ssh-keyscan 185.21.241.163 >> ~/.ssh/known_hosts
-        ssh -4 -L 3000:s01.burovoordeboeg.nl:22 -i bastion.key -Nf circleci@185.21.241.163
+        ssh -4 -L 3000:s01.burovoordeboeg.nl:22 -i ~/.ssh/bastion.key -Nf circleci@185.21.241.163
   
   # Wait for tunnel to setup
   wait_for_ssh_tunnel: &wait_for_ssh_tunnel
@@ -50,7 +48,7 @@ commands:
             then
                 exit 1
             fi
-            rsync -avz -e "ssh -p 3000 -o StrictHostKeyChecking=no -i server.key" --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/<<parameters.path>>
+            rsync -avz -e "ssh -p 3000 -o StrictHostKeyChecking=no -i ~/.ssh/server.key" --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/<<parameters.path>>
 
 jobs:
   production:
