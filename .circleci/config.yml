@@ -38,11 +38,16 @@ commands:
           default: ""
         path:
           type: string
-          default: "none"
+          default: ""
       steps:
         - run:
             name: Rsync deploy to <<parameters.environment>>
-            command: rsync -avz -e "ssh -p $BASTION_PORT -o StrictHostKeyChecking=no -i server.key" --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@$LOCALHOST:/home/$USER/domains/<<parameters.path>>
+            command: |
+              if [ -z <<parameters.path>> ]
+              then
+                  exit 1
+              fi
+              rsync -avz -e "ssh -p $BASTION_PORT -o StrictHostKeyChecking=no -i server.key" --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@$LOCALHOST:/home/$USER/domains/<<parameters.path>>
 
 jobs:
   production:
@@ -53,12 +58,13 @@ jobs:
       - open_ssh_tunnel 
       - rsync_deploy:
           environment: Production
-          path: $PRODUCTION_PATH
+          path: $PRODUCTION_PATHs
       
 workflows:
   deploy:
     jobs:
       - production:
+          name: Deploy to production
           context:
             - buro-voor-de-boeg
           filters: &filter_all
