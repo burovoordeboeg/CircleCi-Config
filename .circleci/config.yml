@@ -23,8 +23,7 @@ references:
       name: Open SSH Tunnel through Bastion-host
       background: true
       command: |
-        ssh-keyscan 185.21.241.163 >> ~/.ssh/known_hosts
-        sudo ssh -4 -L 3000:s01.burovoordeboeg.nl:22 -i bastion.key -Nf circleci@185.21.241.163
+        sudo ssh -4 -L 3000:s01.burovoordeboeg.nl:22 -i bastion.key -Nf -o StrictHostKeyChecking=no circleci@185.21.241.163
   
   # Wait for tunnel to setup
   wait_for_ssh_tunnel: &wait_for_ssh_tunnel
