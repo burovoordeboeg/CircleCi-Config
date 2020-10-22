@@ -16,6 +16,8 @@ commands:
             command: |
               echo $SSH_BASTION_KEY >> bastion.key
               echo $SSH_SERVER_KEY >> server.key
+              chmod 400 bastion.key
+              chmod 400 server.key
     
     # Open a SSH-tunnel
     open_ssh_tunnel:
