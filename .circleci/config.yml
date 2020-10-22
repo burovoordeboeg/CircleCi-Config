@@ -26,7 +26,7 @@ commands:
             name: Open SSH Tunnel through Bastion-host
             background: true
             command: |
-              ssh-keyscan $BASTION_IP >> ~/.ssh/known_hosts
+              ssh-keyscan 185.21.241.163 >> ~/.ssh/known_hosts
               ssh -4 -L 3000:s01.burovoordeboeg.nl:22 -i bastion.key -Nf circleci@185.21.241.163
         - run:
             name: Wait for tunnel to setup
@@ -49,7 +49,7 @@ commands:
               then
                   exit 1
               fi
-              rsync -avz -e "ssh -p $BASTION_PORT -o StrictHostKeyChecking=no -i server.key" --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@$LOCALHOST:/home/$USER/domains/<<parameters.path>>
+              rsync -avz -e "ssh -p 3000 -o StrictHostKeyChecking=no -i server.key" --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/<<parameters.path>>
 
 jobs:
   production:
