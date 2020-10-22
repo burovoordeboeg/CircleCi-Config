@@ -60,7 +60,7 @@ jobs:
       - open_ssh_tunnel 
       - rsync_deploy:
           environment: Production
-          path: $PRODUCTION_PATHs
+          path: $PRODUCTION_PATH
       
 workflows:
   deploy:
