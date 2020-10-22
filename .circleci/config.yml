@@ -32,7 +32,13 @@ commands:
     steps:
       - run:
           name: Rsync deploy to <<parameters.jobname>>
-          command: rsync -avz -e "ssh -p $BASTION_PORT -o StrictHostKeyChecking=no" --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@$LOCALHOST:/home/$USER/domains/<<parameters.path>>
+          command: |
+            if [ -z <<parameters.path>> ]
+            then
+                echo "No path specified to deploy to"
+                exit 1
+            fi
+            rsync -avz -e "ssh -p $BASTION_PORT -o StrictHostKeyChecking=no" --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@$LOCALHOST:/home/$USER/domains/<<parameters.path>>
 
 jobs:
   production:
@@ -43,7 +49,7 @@ jobs:
       - <<: *sleep_for_ssh 
       - rsync_deploy:
           jobname: "production"
-          path: $PRODUCTION_PATH
+          path: $PRODUCTION_PATHs
       
 workflows:
   deploy:
