@@ -14,8 +14,8 @@ references:
       command: |
         echo $SSH_BASTION_KEY >> bastion.key
         echo $SSH_SERVER_KEY >> server.key
-        sudo chmod 600 bastion.key
-        sudo chmod 600 server.key
+        sudo chmod 700 bastion.key
+        sudo chmod 700 server.key
   
   # Open a SSH-tunnel
   open_ssh_tunnel: &open_ssh_tunnel
