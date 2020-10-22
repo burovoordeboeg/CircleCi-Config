@@ -1,54 +1,56 @@
 version: 2.1
 
 references:
-    # Setup default executor
-    defaults: &defaults
-      working_directory: ~/theme
-      docker:
-        - image: circleci/php:7.3-stretch-node-browsers
-    
-    # Setup the SSH keys needed to connect
-    setup_ssh_keys: &setup_ssh_keys
-      run:
-        name: Put server and bastion keys in a file
-        command: |
-          echo $SSH_BASTION_KEY >> bastion.key
-          echo $SSH_SERVER_KEY >> server.key
-    
-    # Open a SSH-tunnel
-    open_ssh_tunnel: &open_ssh_tunnel
-      run: 
-        name: Open SSH Tunnel through Bastion-host
-        background: true
-        command: |
-          ssh-keyscan 185.21.241.163 >> ~/.ssh/known_hosts
-          ssh -4 -L 3000:s01.burovoordeboeg.nl:22 -i bastion.key -Nf circleci@185.21.241.163
-    
-    # Wait for tunnel to setup
-    wait_for_ssh_tunnel: &wait_for_ssh_tunnel
-      run:
-        name: Wait for tunnel to setup
-        command: sleep 8
+  # Setup default executor
+  defaults: &defaults
+    working_directory: ~/theme
+    docker:
+      - image: circleci/php:7.3-stretch-node-browsers
+  
+  # Setup the SSH keys needed to connect
+  setup_ssh_keys: &setup_ssh_keys
+    run:
+      name: Put server and bastion keys in a file
+      command: |
+        echo $SSH_BASTION_KEY >> bastion.key
+        echo $SSH_SERVER_KEY >> server.key
+        sudo chmod 600 bastion.key
+        sudo chmod 600 server.key
+  
+  # Open a SSH-tunnel
+  open_ssh_tunnel: &open_ssh_tunnel
+    run: 
+      name: Open SSH Tunnel through Bastion-host
+      background: true
+      command: |
+        ssh-keyscan 185.21.241.163 >> ~/.ssh/known_hosts
+        ssh -4 -L 3000:s01.burovoordeboeg.nl:22 -i bastion.key -Nf circleci@185.21.241.163
+  
+  # Wait for tunnel to setup
+  wait_for_ssh_tunnel: &wait_for_ssh_tunnel
+    run:
+      name: Wait for tunnel to setup
+      command: sleep 8
     
 commands:
-    # Rsync deploy path specified
-    rsync_deploy:
-      parameters:
-        environment:
-          type: string
-          default: ""
-        path:
-          type: string
-          default: ""
-      steps:
-        - run:
-            name: Rsync deploy to <<parameters.environment>>
-            command: |
-              if [ -z <<parameters.path>> ]
-              then
-                  exit 1
-              fi
-              rsync -avz -e "ssh -p 3000 -o StrictHostKeyChecking=no -i server.key" --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/<<parameters.path>>
+  # Rsync deploy path specified
+  rsync_deploy:
+    parameters:
+      environment:
+        type: string
+        default: ""
+      path:
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: Rsync deploy to <<parameters.environment>>
+          command: |
+            if [ -z <<parameters.path>> ]
+            then
+                exit 1
+            fi
+            rsync -avz -e "ssh -p 3000 -o StrictHostKeyChecking=no -i server.key" --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/<<parameters.path>>
 
 jobs:
   production:
