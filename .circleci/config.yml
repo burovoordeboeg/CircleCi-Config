@@ -43,6 +43,8 @@ workflows:
   deploy:
     jobs:
       - staging:
-        filters: &filter_all
-          tags:
-            only: /.*?/
+          context:
+            - buro-voor-de-boeg
+          filters: &filter_all
+            tags:
+              only: /.*?/
