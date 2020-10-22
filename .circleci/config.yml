@@ -12,7 +12,7 @@ references:
         command: |
           echo $SSH_SERVER_KEY >> server.key
           echo $SSH_BASTION_KEY >> bastion.key
-
+          
     open_ssh_tunnel: &open_ssh_tunnel
       run: 
         name: Open SSH Tunnel through Bastion-host
@@ -26,8 +26,7 @@ references:
         name: Wait for tunnel to setup
         command: sleep 8
 
-commands:
-    rsync_deploy_production:
+    rsync_deploy_production: &rsync_deploy_production
       run:
         name: Rsync deploy to staging path
         command: rsync -avz -e 'ssh -p 3000 -o StrictHostKeyChecking=no' --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@127.0.0.1:/home/$USER/domains/$PRODUCTION_PATH
