@@ -1,0 +1,217 @@
+version: 2.1
+
+references:
+  default: &default
+    working_directory: ~/theme
+    docker:
+      - image: cimg/php:7.3-node
+
+  # Setup SSH Tunneling
+  open_ssh_tunnel: &open_ssh_tunnel
+    run: 
+      name: Open SSH Tunnel through Bastion-host
+      background: true
+      command: |
+        ssh-keyscan $BASTION_IP >> ~/.ssh/known_hosts
+        ssh -4 -L $BASTION_PORT:$SERVER_IP:$SERVER_PORT -Nf $BASTION_USER@$BASTION_IP
+
+  sleep_for_ssh: &sleep_for_ssh
+    run:
+      name: Wait for tunnel to setup
+      command: sleep 8
+
+  # Rsync install
+  rsync_install: &rsync_install
+    run:
+      name: Install rsync
+      command: |
+        sudo apt-get update -y
+        sudo apt-get -y install rsync
+  
+  # NPM
+  npm_restore_cache: &npm_restore_cache
+    restore_cache:
+      keys:
+        - node-v4-{{ checksum "package.json" }}
+        - node-v4-
+
+  npm_save_cache: &npm_save_cache
+    save_cache:
+      key: node-v4-{{ checksum "package.json" }}
+      paths:
+        - node_modules
+
+  npm_install: &npm_install
+    run:
+      name: Install NPM packages
+      command: |
+        npm install --silent
+        npm rebuild node-sass
+  
+  # Composer
+  composer_restore_cache: &composer_restore_cache
+    restore_cache:
+      keys:
+        - v1-dependencies-{{ checksum "composer.lock" }}
+        - v1-dependencies-
+
+  composer_save_cache: &composer_save_cache
+    save_cache:
+      key: composer-v1-{{ checksum "composer.lock" }}
+      paths:
+        - vendor
+  
+  composer_packagist: &composer_packagist
+    run:
+      name: Setup packagist authentication
+      command: composer config --global --auth http-basic.repo.packagist.com jstreuper $PACKAGIST_TOKEN
+
+  composer_install: &composer_install
+    run:
+      name: Compile vendors from composer packages
+      command: composer install -n --ignore-platform-reqs --optimize-autoloader
+  
+  # Linters
+  jslint: &jslint
+    run:
+      name: Lint JavaScript files
+      command: npx gulp jsLint
+  
+  sasslint: &sasslint
+    run:
+      name: Lint SASS files
+      command: npx gulp sassLint
+  
+  # Gulp builds
+  gulp_build_staging: &gulp_build_staging
+    run:
+      name: Build staging assets
+      command: npx gulp build
+
+  gulp_build_production: &gulp_build_production
+    run:
+      name: Build production assets
+      command: npx gulp buildProduction
+
+commands:
+  rsync_deploy:
+    description: Rsync deploy to input path
+    parameters:
+      jobname:
+        type: string
+        default: "production"
+      path: 
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: Rsync deploy to <<parameters.jobname>>
+          command: |
+            if [ -z <<parameters.path>> ]
+            then
+                echo "No path specified to deploy to"
+                exit 1
+            fi
+            rsync -avz -e "ssh -p $BASTION_PORT -o StrictHostKeyChecking=no" --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@$LOCALHOST:/home/$USER/domains/<<parameters.path>>
+
+jobs:
+  jslint:
+    <<: *default
+    steps:
+      - checkout
+      - << : *npm_restore_cache
+      - << : *npm_install
+      - << : *npm_save_cache
+      - << : *jslint
+
+  sasslint:
+    <<: *default
+    steps:
+      - checkout
+      - << : *npm_restore_cache
+      - << : *npm_install
+      - << : *npm_save_cache
+      - << : *sasslint
+
+  staging:
+    <<: *default
+    steps:
+      - checkout
+      - <<: *rsync_install
+      - <<: *npm_restore_cache
+      - <<: *npm_install
+      - <<: *npm_save_cache
+      - <<: *gulp_build_staging
+      - <<: *composer_restore_cache
+      - <<: *composer_packagist
+      - <<: *composer_install
+      - <<: *composer_save_cache
+      - <<: *open_ssh_tunnel 
+      - <<: *sleep_for_ssh 
+      - rsync_deploy:
+          jobname: "staging"
+          path: $STAGING_PATH
+
+  production:
+    <<: *default
+    steps:
+      - checkout
+      - <<: *rsync_install
+      - <<: *npm_restore_cache
+      - <<: *npm_install
+      - <<: *npm_save_cache
+      - <<: *gulp_build_production
+      - <<: *composer_restore_cache
+      - <<: *composer_packagist
+      - <<: *composer_install
+      - <<: *composer_save_cache
+      - <<: *open_ssh_tunnel 
+      - <<: *sleep_for_ssh 
+      - rsync_deploy:
+          jobname: "production"
+          path: $PRODUCTION_PATH
+      
+workflows:
+  deploy:
+    jobs:
+      - jslint:
+          filters: &filter_all
+            tags:
+              only: /.*?/
+
+      - sasslint:
+          filters: *filter_all
+
+      - staging:
+          context:
+            - buro-voor-de-boeg
+          requires:
+            - jslint
+            - sasslint
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only:
+                # v1.0.0-1 / v1.0.0-pre1 / v1.0.0
+                - /^v\d+\.\d+\.\d+(\-.+)?$/
+
+      - approve_deploy:
+          type: approval
+          requires:
+            - staging
+          filters: &filter_production
+            branches:
+              ignore: /.*/
+            tags:
+              only:
+                # v1.0.0
+                - /^v\d+\.\d+\.\d+$/
+
+      - production: 
+          context:
+            - buro-voor-de-boeg
+          requires: 
+            - staging
+            - approve_deploy
+          filters: *filter_production

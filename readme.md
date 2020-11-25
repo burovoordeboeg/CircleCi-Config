@@ -1,32 +1,11 @@
-# CircleCi setup
+# Let op:
+- Voor alle projecten voor 25/11/2020, gebruik config-0.5.0.yml
+- Voor alle nieuwere projecten, gebruik condig-1.0.0.yml
 
-We volgen voor deze geautomatiseerde CI/CD pipeline een git-branching model, uitgaande dat:
-- Je een production, staging en develop branch hebt opgezet
-- De production branch ingesteld hebt als 'default branch'
-- Je werkt in je eigen branch, of eventueel feature-branches voor het ontwikkelen van extra features, je werkt nooit direct in de production of staging branch
-- Je merged features naar de develop branch
-- De develop branch merge je vervolgens middels een release naar staging. In de staging branch maak je een versienummer aan
-- Zodra de staging omgeving akkoord is, maak je een merge naar de production branch, en ook daar maak je een versienummer aan
+Bij gebruik hernoemen naar `config.yml` en in de map `.circleci` te plaatsen in de root van het thema (niet nodig voor gebruik laatste versie base-theme).
 
-Builds triggeren automatisch, zo triggert:
-- Bij elke commit en PR de jsLint en sassLint
-- Bij elke release op de staging branch een staging-deploy
-- Bij elke release op de master branch een master-deploy
+**Config 0.5.0**
+Dit is de configuratie voor CircleCi via de Bastion Jump Host via rSync naar de server. Deze config triggert builds op basis van tagging.
 
-Om je CircleCi omgeving op te zetten voer je de volgende stappen uit:
-1. Ga naar CircleCi en klik aan de linkerzijde op projects, zoek de juiste repository en klik op "set up project", of klik op "follow" als dit erbij staat (in dat geval zijn onderstaande stappen wellicht overbodig)
-2. Klik in het vervolgscherm op "Use existing config" (als je dit scherm niet krijgt, ga naar stap 3), en klik de waarschuwing door "Start building"
-3. De lint-workflow loopt nu automatisch.
-4. Klik rechtsboven op "Project settings", en ga naar de tab SSH-Keys
-5. Klik bij "Additional SSH Keys"  op "Add SSH Key". 
-6. Hostnaam: s01.burovoordeboeg.nl, vervolgens zoek je in Dashlane de "Private Server Key voor CircleCi"
-7. Voeg een tweede SSH Key toe: hostnaam: circleci.burovoordeboeg.nl en zoek in Dashlane naar "Private Bastion Key voor CircleCi"
-8. Ga nu naar de Buro voor de Boeg server, en maak daar de user aan. Vergeet niet deze user SSH-access te verlenen.
-9. Na het aanmaken van de user op de server ga je naar de optie "SSH Keys", onderaan staat "Paste Authorized Key", plaats daar de inhoud van de Dashlane kaart "Public Server Key voor DirectAdmin"
-11. Ga terug naar CircleCi
-11. Ga naar de tab "Environment variables"
-12. Maak drie variabelen aan:
-    - USER > Hier vul je de DirectAdmin gebruikersnaam in
-    - STAGING_PATH > Dit is het pad van het staging-domein, vanaf de domeinnaam, bijvoorbeeld: test.staging.burovoordeboeg.dev/public_html/content/themes/test/
-    - Production_PATH > Dit is het pad van het production-domein, vanaf de domeinnaam, bijvoorbeeld: test.nl/public_html/content/themes/test/
-13. Je kunt nu een build triggeren met een merge vanaf develop naar staging en het toevoegen van een tag. 
+**Config 1.0.0**
+Dit is de nieuwere configuratie voor CircleCi, ook middels een Bastion Jump Host, triggering van builds gebeurt hier op basis van het branching model, beschreven in [de readme van het base-theme](https://github.com/burovoordeboeg/wordpress-base-theme).
