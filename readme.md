@@ -4,7 +4,7 @@
 
 Bij gebruik hernoemen naar `config.yml` en in de map `.circleci` te plaatsen in de root van het thema (niet nodig voor gebruik laatste versie base-theme).
 
-**Config 0.5.0**
+**Config 0.4.5**
 Dit is de configuratie voor CircleCi via de Bastion Jump Host via rSync naar de server. Deze config triggert builds op basis van tagging.
 
 **Config 1.0.0**
