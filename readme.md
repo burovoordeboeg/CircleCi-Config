@@ -1,6 +1,6 @@
 # Let op:
 - Voor alle projecten voor 25/11/2020, gebruik config-0.5.0.yml
-- Voor alle nieuwere projecten, gebruik condig-1.0.0.yml
+- Voor alle nieuwere projecten, gebruik config-1.0.0.yml
 
 Bij gebruik hernoemen naar `config.yml` en in de map `.circleci` te plaatsen in de root van het thema (niet nodig voor gebruik laatste versie base-theme).
 
