@@ -112,7 +112,7 @@ commands:
                 echo "No path specified to deploy to"
                 exit 1
             fi
-            rsync -avz -e "ssh -p $BASTION_PORT -o StrictHostKeyChecking=no" --chown=$USER:$USER --exclude-from '.rsyncignore' . $USER@$LOCALHOST:/home/$USER/domains/<<parameters.path>>
+            rsync -avz -e "ssh -p $BASTION_PORT -o StrictHostKeyChecking=no" --chown=$USER:$USER --delete --exclude-from '.rsyncignore' . $USER@$LOCALHOST:/home/$USER/domains/<<parameters.path>>
 
 jobs:
   jslint:
