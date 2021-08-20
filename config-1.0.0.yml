@@ -150,8 +150,6 @@ jobs:
       - <<: *composer_packagist
       - <<: *composer_install
       - <<: *composer_save_cache
-      - <<: *open_ssh_tunnel 
-      - <<: *sleep_for_ssh 
       - add_serverkey:
           server_ip: $SERVER_IP
       - rsync_deploy:
